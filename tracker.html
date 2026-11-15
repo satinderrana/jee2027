@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>JEE Main 2027 — Command Centre</title>
+<style>
+:root{
+  --bg:#0d0f13; --card:#15181f; --card2:#1b1f27; --line:#252a34;
+  --fg:#e8ebf1; --mut:#8e99ab; --dim:#5d6779;
+  --ph:#5b8def; --ch:#3fbf8f; --ma:#e0913f;
+  --good:#3fbf8f; --warn:#e0a33f; --bad:#e05c5c; --acc:#c9a227;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);
+  font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:26px 20px 80px}
+header{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end;justify-content:space-between;margin-bottom:22px}
+h1{font-size:22px;margin:0;letter-spacing:-.3px}
+.tag{color:var(--mut);font-size:12.5px;margin-top:3px}
+.count{display:flex;gap:26px;align-items:baseline}
+.big{font-size:44px;font-weight:700;line-height:1;color:var(--acc);font-variant-numeric:tabular-nums}
+.big small{font-size:13px;font-weight:500;color:var(--mut);margin-left:4px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 16px 14px}
+.card h2{font-size:12px;text-transform:uppercase;letter-spacing:.9px;color:var(--mut);margin:0 0 12px;font-weight:600}
+.bar{height:7px;background:#0a0c10;border-radius:6px;overflow:hidden;margin:7px 0 5px}
+.bar i{display:block;height:100%;border-radius:6px;transition:width .25s}
+.row{display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px}
+.row b{font-variant-numeric:tabular-nums}
+.muted{color:var(--mut);font-size:12px}
+table{width:100%;border-collapse:collapse}
+th{font-size:10.5px;text-transform:uppercase;letter-spacing:.7px;color:var(--dim);text-align:left;padding:0 8px 6px;font-weight:600}
+td{padding:7px 8px;border-top:1px solid var(--line);font-size:13.5px}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+.units{max-height:540px;overflow:auto;margin:-4px -6px 0;padding:0 6px}
+.units::-webkit-scrollbar{width:8px}
+.units::-webkit-scrollbar-thumb{background:#2a303b;border-radius:8px}
+.srow{display:grid;grid-template-columns:1fr 78px 74px;gap:8px;align-items:center;
+  padding:7px 8px;border-radius:8px;cursor:pointer;border:1px solid transparent}
+.srow:hover{background:var(--card2);border-color:var(--line)}
+.srow .nm{font-size:13.5px;line-height:1.3}
+.srow .nm em{color:var(--dim);font-style:normal;font-size:11px;margin-left:5px}
+.pill{font-size:10.5px;font-weight:600;letter-spacing:.4px;text-transform:uppercase;
+  padding:2px 7px;border-radius:20px;text-align:center;white-space:nowrap}
+.q{font-size:11px;color:var(--dim);text-align:right;font-variant-numeric:tabular-nums}
+.st0{background:#20242c;color:#7c8698}
+.st1{background:#3a2f16;color:#e0b04a}
+.st2{background:#3d2020;color:#e07a6a}
+.st3{background:#1d3340;color:#57a8d6}
+.st4{background:#17342a;color:#4fd39b}
+.tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tab{background:#1b1f27;border:1px solid var(--line);color:var(--mut);font-size:12px;
+  padding:4px 11px;border-radius:20px;cursor:pointer}
+.tab.on{background:var(--acc);color:#151006;border-color:var(--acc);font-weight:600}
+form{display:grid;grid-template-columns:repeat(6,1fr) auto;gap:6px;align-items:end;margin-bottom:10px}
+label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:var(--dim);display:block;margin-bottom:3px}
+input{width:100%;background:#0a0c10;border:1px solid var(--line);color:var(--fg);
+  border-radius:6px;padding:6px 7px;font-size:13px;font-family:inherit}
+input:focus{outline:1px solid var(--acc)}
+button{background:var(--acc);color:#151006;border:none;border-radius:6px;padding:7px 13px;
+  font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit}
+button.ghost{background:#1b1f27;color:var(--mut);border:1px solid var(--line)}
+button:hover{filter:brightness(1.1)}
+.del{color:var(--dim);cursor:pointer;font-size:14px;padding:0 4px}
+.del:hover{color:var(--bad)}
+.foot{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.nextitem{display:flex;gap:9px;align-items:flex-start;padding:7px 0;border-top:1px solid var(--line);font-size:13.5px}
+.nextitem:first-of-type{border-top:none}
+.dot{width:7px;height:7px;border-radius:50%;margin-top:7px;flex:none}
+@media(max-width:820px){.grid{grid-template-columns:1fr}form{grid-template-columns:repeat(3,1fr)}.count{gap:16px}.big{font-size:34px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <h1>JEE Main 2027 — Command Centre</h1>
+    <div class="tag">Session 1: <b>20 &ndash; 24 &amp; 28 January 2027</b> &middot; 75 questions &middot; 300 marks &middot; &plusmn;4/&minus;1</div>
+  </div>
+  <div class="count">
+    <div><div class="big" id="days">—</div><div class="muted">days to first paper</div></div>
+    <div><div class="big" id="ready">0<small>%</small></div><div class="muted">syllabus locked</div></div>
+  </div>
+</header>
+
+<div class="grid">
+  <div class="card">
+    <h2>Readiness by subject</h2>
+    <div id="subjects"></div>
+    <div class="muted" style="margin-top:10px">Weighted by how many questions each chapter usually carries. Tap a chapter below to change its status.</div>
+  </div>
+
+  <div class="card">
+    <h2>Do these next</h2>
+    <div id="next"></div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:14px">
+  <h2>Mocks <span id="mockhead" class="muted" style="text-transform:none;letter-spacing:0"></span></h2>
+  <form id="mockform">
+    <div><label>Date</label><input type="date" id="m_date" required></div>
+    <div><label>Name</label><input id="m_name" placeholder="Mock 1"></div>
+    <div><label>Physics a/c</label><input type="number" min="0" max="25" id="m_pa" placeholder="20"></div>
+    <div><label>Chem a/c</label><input type="number" min="0" max="25" id="m_ca" placeholder="22"></div>
+    <div><label>Maths a/c</label><input type="number" min="0" max="25" id="m_ma" placeholder="18"></div>
+    <div><label>Correct P/C/M</label><input id="m_corr" placeholder="14,17,11"></div>
+    <div><button type="submit">+ Add</button></div>
+  </form>
+  <div id="mocks"></div>
+</div>
+
+<div class="card" style="margin-top:14px">
+  <div class="row" style="margin-bottom:10px">
+    <h2 style="margin:0">Syllabus tracker — 54 units</h2>
+    <span class="muted" id="counts"></span>
+  </div>
+  <div class="tabs" id="tabs">
+    <div class="tab on" data-f="all">All</div>
+    <div class="tab" data-f="Physics">Physics</div>
+    <div class="tab" data-f="Chemistry">Chemistry</div>
+    <div class="tab" data-f="Maths">Maths</div>
+    <div class="tab" data-f="todo">Not locked</div>
+  </div>
+  <div class="units" id="units"></div>
+  <div class="foot">
+    <button class="ghost" id="expand">Export backup</button>
+    <button class="ghost" id="importbtn">Import backup</button>
+    <input type="file" id="importfile" accept="application/json,.json" style="display:none">
+    <button class="ghost" id="reset">Reset all</button>
+  </div>
+  <div class="muted" style="margin-top:10px;line-height:1.5">
+    Progress is stored in <b>this browser only</b> — nothing is on a server. Using two devices?
+    Export on one, Import on the other. Export weekly: clearing browser data erases everything.
+  </div>
+</div>
+</div>
+
+<script>
+const UNITS = [{"subject": "Maths", "unit": 1, "unit_name": "Sets Relations & Functions", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 2, "learn_min": 75, "key_focus": "Domain/range, equivalence, composite, one-one-onto"}, {"subject": "Maths", "unit": 2, "unit_name": "Complex Numbers & Quadratic Equations", "tier": "A", "difficulty": 1, "q_low": 2, "q_high": 2, "learn_min": 90, "key_focus": "Modulus-argument, locus, nature of roots, symmetric functions"}, {"subject": "Maths", "unit": 3, "unit_name": "Matrices & Determinants", "tier": "A", "difficulty": 1, "q_low": 2, "q_high": 2, "learn_min": 90, "key_focus": "Properties of determinants, adjoint/inverse, consistency of equations"}, {"subject": "Maths", "unit": 4, "unit_name": "Permutations & Combinations", "tier": "B", "difficulty": 2, "q_low": 1, "q_high": 2, "learn_min": 90, "key_focus": "Ranking of words, gap/grouping, distribution problems"}, {"subject": "Maths", "unit": 5, "unit_name": "Binomial Theorem", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 2, "learn_min": 60, "key_focus": "General term, middle term, coefficient extraction"}, {"subject": "Maths", "unit": 6, "unit_name": "Sequence & Series", "tier": "A", "difficulty": 1, "q_low": 2, "q_high": 2, "learn_min": 90, "key_focus": "AGP, telescoping, AM-GM, sum of squares/cubes"}, {"subject": "Maths", "unit": 7, "unit_name": "Limits Continuity & Differentiability", "tier": "A", "difficulty": 2, "q_low": 2, "q_high": 3, "learn_min": 120, "key_focus": "L'Hopital, series expansion, functional equations, differentiability checks"}, {"subject": "Maths", "unit": 8, "unit_name": "Integral Calculus", "tier": "B", "difficulty": 2, "q_low": 2, "q_high": 3, "learn_min": 150, "key_focus": "Standard substitutions, by parts, definite integral properties"}, {"subject": "Maths", "unit": 9, "unit_name": "Differential Equations", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 1, "learn_min": 60, "key_focus": "Variable separable, linear DE, homogeneous DE"}, {"subject": "Maths", "unit": 10, "unit_name": "Coordinate Geometry Line Circle Conics", "tier": "B", "difficulty": 2, "q_low": 3, "q_high": 4, "learn_min": 180, "key_focus": "Straight line, family of circles, standard conic results"}, {"subject": "Maths", "unit": 11, "unit_name": "Three Dimensional Geometry", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 2, "learn_min": 75, "key_focus": "Direction cosines, line-plane angle, shortest distance"}, {"subject": "Maths", "unit": 12, "unit_name": "Vector Algebra", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 2, "learn_min": 75, "key_focus": "Dot/cross product, scalar triple product, projection"}, {"subject": "Maths", "unit": 13, "unit_name": "Statistics & Probability", "tier": "A", "difficulty": 1, "q_low": 2, "q_high": 2, "learn_min": 90, "key_focus": "Variance/SD, conditional probability, Bayes, binomial distribution"}, {"subject": "Maths", "unit": 14, "unit_name": "Trigonometry", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 2, "learn_min": 75, "key_focus": "Identities, general solution of equations, inverse trig"}, {"subject": "Physics", "unit": 1, "unit_name": "Units & Measurements", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 1, "learn_min": 45, "key_focus": "Error propagation, dimensional analysis, significant figures"}, {"subject": "Physics", "unit": 2, "unit_name": "Kinematics", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 2, "learn_min": 75, "key_focus": "Projectile, relative velocity, v-t graphs"}, {"subject": "Physics", "unit": 3, "unit_name": "Laws of Motion", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 2, "learn_min": 75, "key_focus": "Friction on incline, pseudo force, constraint relations"}, {"subject": "Physics", "unit": 4, "unit_name": "Work Energy & Power", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 1, "learn_min": 60, "key_focus": "Work-energy theorem, vertical circle, collisions"}, {"subject": "Physics", "unit": 5, "unit_name": "Rotational Motion", "tier": "B", "difficulty": 3, "q_low": 1, "q_high": 2, "learn_min": 150, "key_focus": "Rolling, angular momentum, MOI of standard bodies"}, {"subject": "Physics", "unit": 6, "unit_name": "Gravitation", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 1, "learn_min": 60, "key_focus": "Variation of g, escape/orbital velocity, Kepler"}, {"subject": "Physics", "unit": 7, "unit_name": "Properties of Solids & Liquids", "tier": "B", "difficulty": 2, "q_low": 1, "q_high": 2, "learn_min": 120, "key_focus": "Bernoulli, capillary rise, terminal velocity, calorimetry"}, {"subject": "Physics", "unit": 8, "unit_name": "Thermodynamics", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 2, "learn_min": 90, "key_focus": "First law sign convention, isothermal/adiabatic, efficiency"}, {"subject": "Physics", "unit": 9, "unit_name": "Kinetic Theory of Gases", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 1, "learn_min": 60, "key_focus": "RMS speed, degrees of freedom, Cp/Cv, mean free path"}, {"subject": "Physics", "unit": 10, "unit_name": "Oscillations & Waves", "tier": "B", "difficulty": 2, "q_low": 1, "q_high": 2, "learn_min": 120, "key_focus": "SHM energy/phase, spring combinations, organ pipes, beats"}, {"subject": "Physics", "unit": 11, "unit_name": "Electrostatics", "tier": "B", "difficulty": 2, "q_low": 2, "q_high": 3, "learn_min": 180, "key_focus": "Gauss law applications, dipole, capacitor combinations, energy"}, {"subject": "Physics", "unit": 12, "unit_name": "Current Electricity", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 2, "learn_min": 90, "key_focus": "Kirchhoff, Wheatstone/metre bridge, drift velocity, potentiometer"}, {"subject": "Physics", "unit": 13, "unit_name": "Magnetic Effects of Current", "tier": "B", "difficulty": 2, "q_low": 1, "q_high": 2, "learn_min": 120, "key_focus": "Biot-Savart applications, Ampere law, galvanometer conversion"}, {"subject": "Physics", "unit": 14, "unit_name": "EMI & Alternating Current", "tier": "B", "difficulty": 2, "q_low": 1, "q_high": 2, "learn_min": 120, "key_focus": "Faraday/Lenz, self & mutual inductance, LCR resonance, power factor"}, {"subject": "Physics", "unit": 15, "unit_name": "Electromagnetic Waves", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 1, "learn_min": 45, "key_focus": "Spectrum order, E/B ratio, displacement current"}, {"subject": "Physics", "unit": 16, "unit_name": "Optics", "tier": "B", "difficulty": 2, "q_low": 2, "q_high": 3, "learn_min": 150, "key_focus": "Lens/mirror formula, prism, YDSE fringe width, diffraction, Brewster"}, {"subject": "Physics", "unit": 17, "unit_name": "Dual Nature of Matter & Radiation", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 1, "learn_min": 60, "key_focus": "Photoelectric equation, stopping potential, de Broglie"}, {"subject": "Physics", "unit": 18, "unit_name": "Atoms & Nuclei", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 2, "learn_min": 75, "key_focus": "Bohr levels, hydrogen spectrum, binding energy, decay law"}, {"subject": "Physics", "unit": 19, "unit_name": "Electronic Devices", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 1, "learn_min": 60, "key_focus": "Diode I-V, rectifier, Zener, logic gate truth tables"}, {"subject": "Physics", "unit": 20, "unit_name": "Experimental Skills", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 2, "learn_min": 75, "key_focus": "Vernier/screw gauge errors, the 18 listed experiments"}, {"subject": "Chemistry", "unit": 1, "unit_name": "Some Basic Concepts in Chemistry", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 2, "learn_min": 60, "key_focus": "Mole concept, stoichiometry, limiting reagent, % composition"}, {"subject": "Chemistry", "unit": 2, "unit_name": "Atomic Structure", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 2, "learn_min": 75, "key_focus": "Quantum numbers, orbital shapes, Bohr model, de Broglie"}, {"subject": "Chemistry", "unit": 3, "unit_name": "Chemical Bonding & Molecular Structure", "tier": "A", "difficulty": 2, "q_low": 1, "q_high": 2, "learn_min": 120, "key_focus": "VSEPR, hybridization, MOT bond order, dipole moment"}, {"subject": "Chemistry", "unit": 4, "unit_name": "Chemical Thermodynamics", "tier": "B", "difficulty": 2, "q_low": 1, "q_high": 1, "learn_min": 90, "key_focus": "Hess law, entropy, Gibbs energy, spontaneity"}, {"subject": "Chemistry", "unit": 5, "unit_name": "Solutions", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 1, "learn_min": 60, "key_focus": "Colligative properties, Raoult law, molarity/modality"}, {"subject": "Chemistry", "unit": 6, "unit_name": "Equilibrium", "tier": "A", "difficulty": 2, "q_low": 1, "q_high": 2, "learn_min": 90, "key_focus": "Kp-Kc, Le Chatelier, pH, buffers, solubility product"}, {"subject": "Chemistry", "unit": 7, "unit_name": "Redox Reactions & Electrochemistry", "tier": "B", "difficulty": 2, "q_low": 1, "q_high": 2, "learn_min": 120, "key_focus": "Nernst equation, EMF, conductance, Faraday laws"}, {"subject": "Chemistry", "unit": 8, "unit_name": "Chemical Kinetics", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 1, "learn_min": 60, "key_focus": "Order, rate law, half-life, Arrhenius"}, {"subject": "Chemistry", "unit": 9, "unit_name": "Classification & Periodicity", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 1, "learn_min": 60, "key_focus": "Periodic trends, anomalies, IE/EA/radius"}, {"subject": "Chemistry", "unit": 10, "unit_name": "p-Block Elements", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 2, "learn_min": 90, "key_focus": "Group 13-18 trends, anomalous behaviour, key compounds"}, {"subject": "Chemistry", "unit": 11, "unit_name": "d- and f-Block Elements", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 1, "learn_min": 60, "key_focus": "Oxidation states, colour, lanthanoid contraction, KMnO4/K2Cr2O7"}, {"subject": "Chemistry", "unit": 12, "unit_name": "Coordination Compounds", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 2, "learn_min": 90, "key_focus": "Nomenclature, isomerism, VBT/CFT, magnetic moment"}, {"subject": "Chemistry", "unit": 13, "unit_name": "Purification & Characterisation", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 1, "learn_min": 45, "key_focus": "Distillation, chromatography, qualitative analysis"}, {"subject": "Chemistry", "unit": 14, "unit_name": "Basic Principles of Organic Chemistry", "tier": "B", "difficulty": 2, "q_low": 1, "q_high": 2, "learn_min": 120, "key_focus": "IUPAC, resonance, hyperconjugation, stability, mechanisms"}, {"subject": "Chemistry", "unit": 15, "unit_name": "Hydrocarbons", "tier": "B", "difficulty": 2, "q_low": 1, "q_high": 2, "learn_min": 120, "key_focus": "Markovnikov, ozonolysis, electrophilic substitution"}, {"subject": "Chemistry", "unit": 16, "unit_name": "Organic Compounds with Halogens", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 1, "learn_min": 75, "key_focus": "SN1/SN2, Saytzeff, Grignard, haloarene reactivity"}, {"subject": "Chemistry", "unit": 17, "unit_name": "Organic Compounds with Oxygen", "tier": "B", "difficulty": 3, "q_low": 2, "q_high": 3, "learn_min": 180, "key_focus": "Alcohol/phenol/ether, aldehyde-ketone, carboxylic acids"}, {"subject": "Chemistry", "unit": 18, "unit_name": "Organic Compounds with Nitrogen", "tier": "B", "difficulty": 2, "q_low": 1, "q_high": 1, "learn_min": 90, "key_focus": "Amine basicity order, Hinsberg, diazonium salts"}, {"subject": "Chemistry", "unit": 19, "unit_name": "Biomolecules", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 1, "learn_min": 45, "key_focus": "Carbohydrates, proteins, nucleic acids, vitamins"}, {"subject": "Chemistry", "unit": 20, "unit_name": "Practical Chemistry (Principles)", "tier": "A", "difficulty": 1, "q_low": 1, "q_high": 1, "learn_min": 45, "key_focus": "Salt analysis, cation/anion identification tests"}];
+const STATUS = ["Not started","Learning","Shaky","OK","Locked"];
+const SC = ["st0","st1","st2","st3","st4"];
+const COL = {Physics:"#5b8def", Chemistry:"#3fbf8f", Maths:"#e0913f"};
+const KEY = "jee2027_v1";
+const EXAM = new Date("2027-01-20T09:00:00");
+
+let db = {units:{}, mocks:[]};
+try{ const raw = localStorage.getItem(KEY); if(raw) db = Object.assign(db, JSON.parse(raw)); }catch(e){}
+const save = () => localStorage.setItem(KEY, JSON.stringify(db));
+
+// ---------- percentile curve (average shift, indicative) ----------
+const CURVE=[[80,85],[95,90],[100,91],[110,93],[125,94],[140,95],[145,96],[155,97],[165,97.5],[175,98],[185,98.5],[195,99],[215,99.2],[235,99.5],[255,99.7],[280,99.9],[300,100]];
+function pct(m){
+  if(m<=80) return Math.max(0, 85-(80-m)*0.55);
+  for(let i=0;i<CURVE.length-1;i++){
+    const [m1,p1]=CURVE[i], [m2,p2]=CURVE[i+1];
+    if(m>=m1&&m<=m2) return p1+(p2-p1)*(m-m1)/(m2-m1);
+  }
+  return 100;
+}
+const rank = p => Math.max(1, Math.round((100-p)/100*1400000)).toLocaleString("en-IN");
+
+// ---------- units ----------
+const id = u => u.subject+"-"+u.unit;
+const get = u => db.units[id(u)] || 0;
+
+function readyOf(list){
+  let w=0, got=0;
+  list.forEach(u=>{ w += u.q_high; got += u.q_high*get(u); });
+  return w? Math.round(100*got/(w*4)) : 0;
+}
+
+function renderCountdown(){
+  const d = Math.ceil((EXAM - new Date())/86400000);
+  document.getElementById("days").textContent = d>0 ? d : 0;
+  document.getElementById("ready").innerHTML = readyOf(UNITS)+"<small>%</small>";
+}
+
+function renderSubjects(){
+  const host = document.getElementById("subjects");
+  host.innerHTML = "";
+  ["Physics","Chemistry","Maths"].forEach(s=>{
+    const list = UNITS.filter(u=>u.subject===s);
+    const p = readyOf(list);
+    const locked = list.filter(u=>get(u)>=3).length;
+    host.insertAdjacentHTML("beforeend", `
+      <div style="margin-bottom:12px">
+        <div class="row"><span>${s}</span><b style="color:${COL[s]}">${p}%</b></div>
+        <div class="bar"><i style="width:${p}%;background:${COL[s]}"></i></div>
+        <div class="muted">${locked} of ${list.length} chapters at OK or better</div>
+      </div>`);
+  });
+}
+
+function renderNext(){
+  const host = document.getElementById("next");
+  const tier = {A:0,B:1,C:2};
+  const todo = UNITS.filter(u=>get(u)<3)
+    .sort((a,b)=> (tier[a.tier]-tier[b.tier]) || (a.difficulty-b.difficulty) || (b.q_high-a.q_high) || get(a)-get(b))
+    .slice(0,7);
+  if(!todo.length){
+    host.innerHTML = '<div class="muted">Everything is at OK or better. Now it is revision + mocks only — read your error log, not new theory.</div>';
+    return;
+  }
+  host.innerHTML = todo.map(u=>`
+    <div class="nextitem">
+      <div class="dot" style="background:${COL[u.subject]}"></div>
+      <div><b>${u.unit_name}</b> <span class="muted">· ${u.subject} · tier ${u.tier} · ~${u.q_high} Q</span>
+      <div class="muted">${u.key_focus}</div></div>
+    </div>`).join("");
+}
+
+function renderUnits(){
+  const f = document.querySelector(".tab.on").dataset.f;
+  const host = document.getElementById("units");
+  let list = UNITS.slice();
+  if(f!=="all" && f!=="todo") list = list.filter(u=>u.subject===f);
+  if(f==="todo") list = list.filter(u=>get(u)<4);
+  const order = {Physics:0,Chemistry:1,Maths:2};
+  if(f==="all"||f==="todo") list.sort((a,b)=> order[a.subject]-order[b.subject] || a.unit-b.unit);
+  host.innerHTML = list.map(u=>{
+    const s = get(u);
+    return `<div class="srow" data-k="${id(u)}">
+      <div class="nm">${u.unit_name}<em>${u.subject} · ${u.unit}</em></div>
+      <div class="pill ${SC[s]}">${STATUS[s]}</div>
+      <div class="q">${u.q_low}–${u.q_high} Q</div>
+    </div>`;
+  }).join("");
+  const c = [0,1,2,3,4].map(s=>UNITS.filter(u=>get(u)===s).length);
+  document.getElementById("counts").textContent =
+    `${c[4]} locked · ${c[3]} ok · ${c[2]} shaky · ${c[1]} learning · ${c[0]} untouched`;
+}
+
+document.getElementById("units").addEventListener("click", e=>{
+  const row = e.target.closest(".srow"); if(!row) return;
+  const k = row.dataset.k;
+  db.units[k] = ((db.units[k]||0)+1) % 5;
+  save(); renderAll();
+});
+
+document.getElementById("tabs").addEventListener("click", e=>{
+  if(!e.target.classList.contains("tab")) return;
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("on"));
+  e.target.classList.add("on"); renderUnits();
+});
+
+// ---------- mocks ----------
+function sparkline(vals, w=420, h=54){
+  if(vals.length<2) return "";
+  const mx = Math.max(...vals, 300), mn = 0;
+  const X = i => 6 + i*(w-12)/(vals.length-1);
+  const Y = v => h-6 - (v-mn)*(h-12)/(mx-mn);
+  const pts = vals.map((v,i)=>`${X(i).toFixed(1)},${Y(v).toFixed(1)}`).join(" ");
+  const dots = vals.map((v,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(v).toFixed(1)}" r="3" fill="#c9a227"/>`).join("");
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="${h}" style="margin:8px 0 4px">
+    <polyline points="${pts}" fill="none" stroke="#c9a227" stroke-width="2" stroke-linejoin="round"/>
+    ${dots}</svg>`;
+}
+
+function renderMocks(){
+  const host = document.getElementById("mocks");
+  const ms = db.mocks.slice().sort((a,b)=>a.date.localeCompare(b.date));
+  if(!ms.length){
+    host.innerHTML = '<div class="muted">Log your first mock above. A number you track weekly is worth ten you don\'t.</div>';
+    document.getElementById("mockhead").textContent = "";
+    return;
+  }
+  const calc = m => 4*(m.pc+m.cc+m.mc) - ((m.pa-m.pc)+(m.ca-m.cc)+(m.ma-m.mc));
+  const best = Math.max(...ms.map(calc));
+  const last = calc(ms[ms.length-1]);
+  document.getElementById("mockhead").innerHTML =
+    ` &nbsp;latest <b style="color:var(--acc)">${last}</b>/300 · ~${pct(last).toFixed(2)} pct · AIR ~${rank(pct(last))} · best ${best}`;
+
+  let html = sparkline(ms.map(calc)) + `<table><tr><th>Date</th><th>Test</th><th class="n">P</th><th class="n">C</th><th class="n">M</th><th class="n">Total</th><th class="n">%ile</th><th class="n">Wrong</th><th></th></tr>`;
+  ms.forEach((m,i)=>{
+    const p=4*m.pc-(m.pa-m.pc), c=4*m.cc-(m.ca-m.cc), mm=4*m.mc-(m.ma-m.mc);
+    const t=p+c+mm, wrong=(m.pa-m.pc)+(m.ca-m.cc)+(m.ma-m.mc);
+    html += `<tr><td class="muted">${m.date.slice(5)}</td><td>${m.name||"—"}</td>
+      <td class="n">${p}</td><td class="n">${c}</td><td class="n">${mm}</td>
+      <td class="n"><b>${t}</b></td><td class="n">${pct(t).toFixed(2)}</td>
+      <td class="n" style="color:${wrong>24?'var(--bad)':'var(--mut)'}">${wrong}</td>
+      <td style="text-align:right"><span class="del" data-i="${ms.indexOf(m)}">×</span></td></tr>`;
+  });
+  host.innerHTML = html + "</table>";
+}
+
+document.getElementById("mocks").addEventListener("click", e=>{
+  if(!e.target.classList.contains("del")) return;
+  const ms = db.mocks.slice().sort((a,b)=>a.date.localeCompare(b.date));
+  const target = ms[+e.target.dataset.i];
+  db.mocks = db.mocks.filter(x=>x!==target);
+  save(); renderAll();
+});
+
+document.getElementById("mockform").addEventListener("submit", e=>{
+  e.preventDefault();
+  const g = x=>+document.getElementById(x).value||0;
+  const corr = (document.getElementById("m_corr").value||"").split(",").map(x=>+x.trim()||0);
+  const pa=g("m_pa"), ca=g("m_ca"), ma=g("m_ma");
+  const pc=corr[0]||0, cc=corr[1]||0, mc=corr[2]||0;
+  if(pc>pa||cc>ca||mc>ma){ alert("Correct cannot exceed attempted."); return; }
+  db.mocks.push({date:document.getElementById("m_date").value, name:document.getElementById("m_name").value,
+                 pa,ca,ma,pc,cc,mc});
+  save(); e.target.reset(); renderAll();
+});
+
+// ---------- footer ----------
+function applyImport(obj){
+  if(!obj || typeof obj!=="object" || typeof obj.units!=="object")
+    throw new Error("that is not a tracker backup");
+  const n = Object.keys(obj.units||{}).length, m = (obj.mocks||[]).length;
+  db.units = obj.units || {};
+  db.mocks = Array.isArray(obj.mocks) ? obj.mocks : [];
+  save(); renderAll();
+  return n+" chapters, "+m+" mocks";
+}
+
+document.getElementById("importbtn").onclick = ()=> document.getElementById("importfile").click();
+document.getElementById("importfile").addEventListener("change", e=>{
+  const f = e.target.files && e.target.files[0];
+  if(!f) return;
+  const rd = new FileReader();
+  rd.onload = ()=>{
+    try { alert("Restored "+applyImport(JSON.parse(rd.result))); }
+    catch(err){ alert("Could not import: "+err.message); }
+  };
+  rd.onerror = ()=> alert("Could not read that file.");
+  rd.readAsText(f);
+  e.target.value = "";
+});
+
+document.getElementById("expand").onclick = ()=>{
+  const blob = new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "jee2027-backup-"+new Date().toISOString().slice(0,10)+".json";
+  a.click();
+};
+document.getElementById("reset").onclick = ()=>{
+  if(confirm("Erase all progress and mocks in this browser?")){
+    db={units:{},mocks:[]}; save(); renderAll();
+  }
+};
+
+function renderAll(){ renderCountdown(); renderSubjects(); renderNext(); renderUnits(); renderMocks(); }
+renderAll();
+</script>
+</body>
+</html>
