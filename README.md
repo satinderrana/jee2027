@@ -69,6 +69,32 @@ Progress is stored in whichever browser opens it (localStorage), so:
 
 Still true: the hosted page does **not** store progress anywhere central. Each browser keeps its own.
 
+## Editing progress on this machine (tailnet)
+
+A small server serves `site/` and accepts progress writes, so the tracker's data lives on this
+machine instead of inside one browser profile:
+
+**http://100.121.171.113:8123/**
+
+- The tracker shows **● synced HH:MM** when it is talking to the machine, **○ this browser only**
+  when it is not (offline, or the GitHub Pages copy). It falls back silently and keeps working.
+- Every change is saved to `data/progress.json` about a second after you stop clicking, and the
+  **plan is regenerated and republished automatically** — `site/plan.html` is rebuilt on each save.
+- Writes are validated (status 0–4, correct ≤ attempted) before they can replace good data, and the
+  previous copy is kept in `data/backups/` (last 30).
+- Bound to the **tailnet IP only** (`100.121.171.113`), never the public interface. Traffic is inside
+  WireGuard. Restart with `--hours 3 --weak Physics` to change how the plan is generated.
+
+```bash
+# manual control
+python3 tools/server.py --host 100.121.171.113 --port 8123 --hours 6 --weak Maths
+pkill -f "server[.]py --host 100.121.171.113"      # stop
+curl -s http://100.121.171.113:8123/api/ping       # health
+```
+
+It restarts on boot and is health-checked every 5 minutes by cron. For an HTTPS name instead of a
+raw IP, enable Tailscale **Serve** in the admin console, then `tailscale serve --bg 8123`.
+
 ## Regenerating the plan from your tracker
 
 The tracker saves progress in the browser, so the planner needs it handed over. Two ways,

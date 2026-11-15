@@ -78,6 +78,7 @@ button:hover{filter:brightness(1.1)}
   <div>
     <h1>JEE Main 2027 — Command Centre</h1>
     <div class="tag">Session 1: <b>20 &ndash; 24 &amp; 28 January 2027</b> &middot; 75 questions &middot; 300 marks &middot; &plusmn;4/&minus;1</div>
+    <div class="tag" id="sync" style="margin-top:6px;font-size:12px"></div>
   </div>
   <div class="count">
     <div><div class="big" id="days">—</div><div class="muted">days to first paper</div></div>
@@ -129,6 +130,7 @@ button:hover{filter:brightness(1.1)}
     <button class="ghost" id="expand">Export backup</button>
     <button class="ghost" id="importbtn">Import backup</button>
     <button class="ghost" id="copycode">Copy code</button>
+    <button class="ghost" id="pushnow" style="display:none">Save to machine</button>
     <input type="file" id="importfile" accept="application/json,.json" style="display:none">
     <button class="ghost" id="reset">Reset all</button>
   </div>
@@ -149,7 +151,94 @@ const EXAM = new Date("2027-01-20T09:00:00");
 
 let db = {units:{}, mocks:[]};
 try{ const raw = localStorage.getItem(KEY); if(raw) db = Object.assign(db, JSON.parse(raw)); }catch(e){}
-const save = () => localStorage.setItem(KEY, JSON.stringify(db));
+// ---------- storage: localStorage cache + optional server sync ----------
+const API = "/api/progress";
+const sync = { mode: "local", at: null, err: null };
+let pushTimer = null, lastPushed = "";
+const snapshot = () => JSON.stringify({units: db.units, mocks: db.mocks});
+
+function save(){
+  localStorage.setItem(KEY, JSON.stringify(db));
+  if(sync.mode === "server") schedulePush();
+}
+
+function renderSync(){
+  const el = document.getElementById("sync");
+  if(!el) return;
+  if(sync.mode === "server"){
+    el.innerHTML = sync.at
+      ? `<span style="color:var(--good)">●</span> synced ${sync.at}`
+      : `<span style="color:var(--good)">●</span> connected to this machine`;
+  } else {
+    el.innerHTML = `<span style="color:var(--warn)">○</span> this browser only`;
+  }
+  const b = document.getElementById("pushnow");
+  if(b) b.style.display = sync.mode === "server" ? "" : "none";
+}
+
+function schedulePush(){
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(pushNow, 900);
+}
+
+async function pushNow(){
+  const payload = snapshot();
+  if(payload === lastPushed) return true;
+  try{
+    const r = await fetch(API, {method:"POST", headers:{"Content-Type":"application/json"}, body:payload});
+    if(!r.ok){
+      const j = await r.json().catch(()=>({}));
+      throw new Error(j.error || ("HTTP " + r.status));
+    }
+    lastPushed = payload;
+    sync.mode = "server"; sync.at = new Date().toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+    sync.err = null;
+  }catch(e){
+    sync.mode = "local"; sync.err = e.message;   // stays usable offline
+  }
+  renderSync();
+  return sync.mode === "server";
+}
+
+async function initSync(){
+  // probe first: a files-only copy (GitHub Pages, file://) has no endpoint at all
+  try{
+    const p = await fetch("/api/ping", {cache:"no-store"});
+    if(!p.ok) throw new Error("no sync endpoint");
+  }catch(e){
+    sync.mode = "local"; sync.err = e.message;
+    renderSync();
+    return;
+  }
+  sync.mode = "server";
+  let server = null;
+  try{
+    const r = await fetch(API, {cache:"no-store"});
+    if(r.ok) server = await r.json();
+  }catch(e){ sync.err = e.message; }
+  const srv = (server && server.units) ? server.units : {};
+  const srvN = Object.keys(srv).length, locN = Object.keys(db.units).length;
+  if(srvN === 0 && locN > 0){
+    await pushNow();                       // seed the machine from this browser
+  } else if(srvN > 0){
+    const differs = JSON.stringify(srv) !== JSON.stringify(db.units);
+    let useServer = true;
+    if(locN > 0 && differs){
+      useServer = confirm(`On this machine: ${srvN} chapters marked.\nIn this browser: ${locN}.\n\nOK = use the machine's copy\nCancel = keep this browser's copy and overwrite the machine's`);
+    }
+    if(useServer){
+      db.units = srv;
+      db.mocks = Array.isArray(server.mocks) ? server.mocks : [];
+      localStorage.setItem(KEY, JSON.stringify(db));
+      lastPushed = snapshot();
+      renderAll();
+    } else {
+      await pushNow();
+    }
+  }
+  sync.at = null;
+  renderSync();
+}
 
 // ---------- percentile curve (average shift, indicative) ----------
 const CURVE=[[80,85],[95,90],[100,91],[110,93],[125,94],[140,95],[145,96],[155,97],[165,97.5],[175,98],[185,98.5],[195,99],[215,99.2],[235,99.5],[255,99.7],[280,99.9],[300,100]];
@@ -365,6 +454,12 @@ document.getElementById("reset").onclick = ()=>{
 
 function renderAll(){ renderCountdown(); renderSubjects(); renderNext(); renderUnits(); renderMocks(); }
 renderAll();
+renderSync();
+initSync();
+document.getElementById("pushnow").onclick = async ()=>{
+  const ok = await pushNow();
+  if(!ok) alert("Could not reach the machine: " + (sync.err || "unknown error"));
+};
 </script>
 </body>
 </html>
