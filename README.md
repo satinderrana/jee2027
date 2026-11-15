@@ -63,12 +63,44 @@ Progress is stored in whichever browser opens it (localStorage), so:
 - Move progress with **Export backup** on device A → **Import backup** on device B.
 - Clearing browser data / private windows erases progress. Export weekly.
 
-There is no public URL by default — nothing in this folder is served from anywhere.
+**Published:** https://satinderrana.github.io/jee2027/ (repo `satinderrana/jee2027`, published from
+`site/`). Update the site with `cd site && cp ../tracker.html ../out/study_plan.html . && git add -A
+&& git commit -m update && git push` — Pages rebuilds in about a minute.
 
-## Regenerating the plan
+Still true: the hosted page does **not** store progress anywhere central. Each browser keeps its own.
+
+## Regenerating the plan from your tracker
+
+The tracker saves progress in the browser, so the planner needs it handed over. Two ways,
+both from the buttons at the bottom of `tracker.html`:
+
+| Button | What you get | Use when |
+|---|---|---|
+| **Copy code** | a `JEE2027:...` string on the clipboard | fastest; paste it into chat |
+| **Export backup** | `jee2027-backup-<date>.json` | you want a file on disk |
+
+Then:
 
 ```bash
-python3 tools/planner.py --hours 6 --weak Chemistry            # default
+python3 tools/planner.py --progress data/progress.json --hours 6 --weak Maths
+```
+
+How status is treated:
+
+| Status | Gets |
+|---|---|
+| 0 not started | `LEARN` — full pass (1.2× base time) |
+| 1 learning | `REBUILD` — from the beginning (0.9×) |
+| 2 shaky | `REBUILD` first, before anything new (1.0×) — half-known is cheaper to fix than fresh is to learn |
+| 3 OK | one `REVISE (lock it)` pass in the revision ladder |
+| 4 locked | revision ladder only; never re-taught |
+
+No progress file = blank-slate plan (everything to learn). `data/progress.sample.json` is a
+fixture for testing the progress path.
+
+## Other planner options
+
+```bash
 python3 tools/planner.py --hours 8 --weak Physics,Maths        # different week
 python3 tools/planner.py --start 2026-11-22 --hours 5 --out out/plan_v2
 ```

@@ -128,6 +128,7 @@ button:hover{filter:brightness(1.1)}
   <div class="foot">
     <button class="ghost" id="expand">Export backup</button>
     <button class="ghost" id="importbtn">Import backup</button>
+    <button class="ghost" id="copycode">Copy code</button>
     <input type="file" id="importfile" accept="application/json,.json" style="display:none">
     <button class="ghost" id="reset">Reset all</button>
   </div>
@@ -307,6 +308,17 @@ document.getElementById("mockform").addEventListener("submit", e=>{
 });
 
 // ---------- footer ----------
+function makeCode(){
+  const s = JSON.stringify({units: db.units, mocks: db.mocks});
+  return "JEE2027:" + btoa(unescape(encodeURIComponent(s)));
+}
+
+document.getElementById("copycode").onclick = async ()=>{
+  const code = makeCode();
+  try { await navigator.clipboard.writeText(code); alert("Progress code copied.\nPaste it into your chat with Hermes."); }
+  catch(e){ window.prompt("Copy this code:", code); }
+};
+
 function applyImport(obj){
   if(!obj || typeof obj!=="object" || typeof obj.units!=="object")
     throw new Error("that is not a tracker backup");
@@ -323,7 +335,14 @@ document.getElementById("importfile").addEventListener("change", e=>{
   if(!f) return;
   const rd = new FileReader();
   rd.onload = ()=>{
-    try { alert("Restored "+applyImport(JSON.parse(rd.result))); }
+    try {
+      let txt = String(rd.result).trim();
+      if(txt.startsWith("JEE2027:")){
+        const b = txt.slice(8);
+        txt = decodeURIComponent(escape(atob(b)));
+      }
+      alert("Restored "+applyImport(JSON.parse(txt)));
+    }
     catch(err){ alert("Could not import: "+err.message); }
   };
   rd.onerror = ()=> alert("Could not read that file.");
