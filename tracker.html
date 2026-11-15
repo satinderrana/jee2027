@@ -103,10 +103,10 @@ button:hover{filter:brightness(1.1)}
   <form id="mockform">
     <div><label>Date</label><input type="date" id="m_date" required></div>
     <div><label>Name</label><input id="m_name" placeholder="Mock 1"></div>
-    <div><label>Physics a/c</label><input type="number" min="0" max="25" id="m_pa" placeholder="20"></div>
-    <div><label>Chem a/c</label><input type="number" min="0" max="25" id="m_ca" placeholder="22"></div>
-    <div><label>Maths a/c</label><input type="number" min="0" max="25" id="m_ma" placeholder="18"></div>
-    <div><label>Correct P/C/M</label><input id="m_corr" placeholder="14,17,11"></div>
+    <div><label title="How many you attempted">P attempted</label><input type="number" min="0" max="25" id="m_pa" placeholder="20"></div>
+    <div><label title="How many you attempted">C attempted</label><input type="number" min="0" max="25" id="m_ca" placeholder="22"></div>
+    <div><label title="How many you attempted">M attempted</label><input type="number" min="0" max="25" id="m_ma" placeholder="18"></div>
+    <div><label title="How many of those were right">Right: P,C,M</label><input id="m_corr" placeholder="14,17,11"></div>
     <div><button type="submit">+ Add</button></div>
   </form>
   <div id="mocks"></div>
