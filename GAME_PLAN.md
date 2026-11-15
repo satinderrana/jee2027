@@ -74,7 +74,10 @@ January.
 
 ### Weekly rhythm
 
-- **Mon–Sat:** 2 chapters in depth + 20 min error-log review + 15 min formula recall. Roughly 6 hours.
+- **Every day:** 2 chapters in depth, then ~4 revision blocks of already-known chapters, one timed sectional
+  and a mixed PYQ set. Roughly **8 hours**, since he is self-studying with no school or coaching.
+- **No fixed rest day is needed** when the day already contains a long lunch and 20-minute breaks — but if two
+  mocks in a row go down, take one full day off. That is fatigue, not laziness.
 - **Sunday:** full mock 9–12, then **100 minutes of analysis**. The analysis is the part that pays.
 - **One evening off per week.** Non-negotiable. A burnt-out student in the last three weeks is worth
   less than a rested one with two fewer chapters.
@@ -204,8 +207,10 @@ Say this to him once, plainly, and then stop mentioning it.
 |---|---|
 | `tracker.html` | Open in any browser. 66-day countdown, all 54 chapters with status, mock log with percentile estimate. Saves automatically. |
 | `out/study_plan.html` | The dated day-by-day plan. Print it. |
+| `out/days.html` | The same plan on a clock — every day with start/end times, breaks and lunch. |
 | `tools/mock_analyzer.py` | Turns mock results into marks, percentile, accuracy and a 7-day fix list. |
 | `tools/planner.py` | Regenerates the day-by-day plan if the hours/day or weak subject change. |
+| `tools/day_schedule.py` | Lays any day's blocks on an hourly clock (mocks pinned to 09:00). |
 | `data/syllabus.csv` | The 54 units with tier, difficulty and typical question count. Editable. |
 | `data/mocks.csv` | Mock history. Add rows via `--date ...` or by hand. |
 | `README.md` | How to run everything. |

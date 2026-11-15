@@ -21,7 +21,8 @@ jee2027/
 ├── GAME_PLAN.md              the strategy — read this first
 ├── tracker.html              open in a browser: countdown, 54 chapters, mock log
 ├── out/
-│   ├── study_plan.html       the dated day-by-day plan (print this)
+│   ├── study_plan.html       the dated day-by-day plan
+│   ├── days.html             the same plan on a clock — hourly, printable
 │   └── study_plan.csv        same plan as data, if you prefer a spreadsheet
 ├── data/
 │   ├── syllabus.csv          54 units w/ tier, difficulty, typical question count
@@ -29,6 +30,7 @@ jee2027/
 │   └── mocks.sample.csv      worked example of the format
 ├── tools/
 │   ├── planner.py            regenerate the plan
+│   ├── day_schedule.py       lay a day's blocks on an hourly clock
 │   ├── mock_analyzer.py      turn a mock into a 7-day fix list
 │   ├── build_tracker.py      rebuild tracker.html from syllabus.csv
 │   ├── tracker.template.html source for tracker.html
@@ -108,7 +110,7 @@ both from the buttons at the bottom of `tracker.html`:
 Then:
 
 ```bash
-python3 tools/planner.py --progress data/progress.json --hours 6 --weak Maths
+python3 tools/planner.py --progress data/progress.json --hours 8 --weak Maths
 ```
 
 How status is treated:
@@ -123,6 +125,18 @@ How status is treated:
 
 No progress file = blank-slate plan (everything to learn). `data/progress.sample.json` is a
 fixture for testing the progress path.
+
+## The hourly view
+
+```bash
+python3 tools/day_schedule.py --date 2026-11-16      # one day, printed to the terminal
+python3 tools/day_schedule.py --all                  # every day -> out/days.html
+python3 tools/day_schedule.py --all --wake 05:45 --lunch 13:00
+```
+
+It takes the blocks in the order the planner intended and decides only when they happen: 06:50 start
+(wake + 20 min), breaks sized to the block (10/15/20 min), one 45-minute lunch, and full mocks pinned
+to **09:00** so his body learns what the real paper feels like. Nothing is placed after the last block.
 
 ## Other planner options
 
