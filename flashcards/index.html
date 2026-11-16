@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>JEE Flashcards — Datacenter</title>
+<style>
+  :root {
+    --ink: #111827; --muted: #6b7280; --line: #e5e7eb;
+    --accent: #0f766e; --accent-soft: #ccfbf1; --accent-dark: #115e59;
+    --bg: #f8fafc; --card: #ffffff;
+    --maths: #0f766e; --physics: #4338ca; --chemistry: #b45309;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg); color: var(--ink); font-size: 14px; line-height: 1.5;
+  }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 18px 16px 80px; }
+
+  header { margin-bottom: 12px; }
+  header .row { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  header h1 { margin: 0; font-size: 22px; color: var(--ink); }
+  header h1 .logo { color: var(--accent); }
+  .countdown { font-size: 13px; color: var(--muted); }
+  .countdown b { color: var(--accent-dark); font-size: 16px; }
+  .sub { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+  .actions { display: flex; gap: 8px; margin: 12px 0 4px; flex-wrap: wrap; }
+  button {
+    font: inherit; border: 1px solid var(--line); background: var(--card);
+    border-radius: 8px; padding: 7px 12px; cursor: pointer; color: var(--ink);
+  }
+  button:hover { background: #f1f5f9; }
+  input[type=file] { display: none; }
+
+  .overview { display: flex; gap: 10px; flex-wrap: wrap; margin: 10px 0 18px; }
+  .ov {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 10px 14px; min-width: 110px;
+  }
+  .ov .v { font-size: 22px; font-weight: 700; color: var(--accent-dark); }
+  .ov .k { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+
+  .subject { margin-bottom: 22px; }
+  .subject > h2 {
+    font-size: 14px; margin: 0 0 8px; padding: 6px 10px; color: #fff; border-radius: 8px;
+    display: inline-block; font-weight: 700;
+  }
+  .subject[data-s="Maths"] > h2 { background: var(--maths); }
+  .subject[data-s="Physics"] > h2 { background: var(--physics); }
+  .subject[data-s="Chemistry"] > h2 { background: var(--chemistry); }
+
+  .chapters { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  @media (max-width: 640px) { .chapters { grid-template-columns: 1fr; } }
+
+  .ch {
+    background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+    padding: 9px 12px; display: flex; flex-direction: column; gap: 6px;
+  }
+  .ch .top { display: flex; align-items: center; gap: 8px; }
+  .ch .name { font-weight: 600; font-size: 13.5px; flex: 1; }
+  .tier {
+    font-size: 10px; font-weight: 700; border-radius: 99px; padding: 1px 7px; flex: none;
+  }
+  .tier.A { background: #dcfce7; color: #15803d; }
+  .tier.B { background: #fef3c7; color: #b45309; }
+  .tier.C { background: #fee2e2; color: #b91c1c; }
+
+  .ch.pending { opacity: .55; }
+  .ch.pending .name { color: var(--muted); font-weight: 500; }
+  .ch .meta { font-size: 11.5px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
+  .ch .bar { height: 6px; background: #e5e7eb; border-radius: 99px; overflow: hidden; flex: 1; }
+  .ch .bar .fill { height: 100%; background: var(--accent); border-radius: 99px; }
+  .ch a.revise {
+    display: inline-block; background: var(--accent); color: #fff; text-decoration: none;
+    border-radius: 8px; padding: 5px 12px; font-size: 12.5px; font-weight: 600; text-align: center;
+  }
+  .ch a.revise:hover { background: var(--accent-dark); }
+  .ch .soon { font-size: 11px; color: #9ca3af; font-style: italic; }
+
+  .note { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); margin-top: 20px; padding-top: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="row">
+      <h1><span class="logo">▣</span> JEE Flashcards — Datacenter</h1>
+      <div class="countdown">Session 1 in <b id="countdown">—</b> days</div>
+    </div>
+    <div class="sub">One deck per chapter · spaced repetition · offline · progress saves in this browser</div>
+  </header>
+
+  <div class="actions">
+    <button id="backupAllBtn">⬇ Backup all progress</button>
+    <button id="restoreAllBtn">⬆ Restore all progress</button>
+    <input type="file" id="restoreFile" accept="application/json">
+  </div>
+
+  <div class="overview" id="overview"></div>
+
+  <div id="subjects"></div>
+
+  <div class="note">
+    <b>How it works:</b> tap a chapter → cards due today surface first. Each card advances through
+    New → Day 1 → Day 3 → Day 7 → Locked as you mark it "Good"; "Again" sends it back to New.
+    Progress is per-browser — use <b>Backup all</b> to move it between devices.
+  </div>
+</div>
+
+<script src="decks.js"></script>
+<script src="engine.js"></script>
+<script>
+(function () {
+  "use strict";
+  var decks = window.JEE_DECKS || [];
+  var store = window.Flashcards ? window.Flashcards.readAll() : {};
+
+  // countdown to Session 1 (20 Jan 2027, 00:00 local)
+  var exam = new Date("2027-01-20T00:00:00");
+  var days = Math.max(0, Math.ceil((exam - Date.now()) / 86400000));
+  document.getElementById("countdown").textContent = days;
+
+  function deckProgress(slug, count) {
+    var d = store[slug] || {};
+    var locked = 0, learning = 0, fresh = 0;
+    for (var i = 0; i < count; i++) {
+      var c = d[i];
+      if (!c || c.box === 0) fresh++;
+      else if (c.box >= 4) locked++;
+      else learning++;
+    }
+    return { locked: locked, learning: learning, fresh: fresh };
+  }
+
+  var built = decks.filter(function (d) { return d.built; });
+  var totalCards = built.reduce(function (a, d) { return a + d.count; }, 0);
+  var totalLocked = 0;
+  built.forEach(function (d) { totalLocked += deckProgress(d.slug, d.count).locked; });
+
+  document.getElementById("overview").innerHTML =
+    '<div class="ov"><div class="v">' + built.length + '</div><div class="k">chapters built</div></div>' +
+    '<div class="ov"><div class="v">' + decks.length + '</div><div class="k">total chapters</div></div>' +
+    '<div class="ov"><div class="v">' + totalCards + '</div><div class="k">cards</div></div>' +
+    '<div class="ov"><div class="v">' + totalLocked + '</div><div class="k">locked (mastered)</div></div>';
+
+  var subjects = ["Maths", "Physics", "Chemistry"];
+  var holder = document.getElementById("subjects");
+  subjects.forEach(function (subj) {
+    var list = decks.filter(function (d) { return d.subject === subj; });
+    var sec = document.createElement("div");
+    sec.className = "subject";
+    sec.setAttribute("data-s", subj);
+    var h = document.createElement("h2");
+    h.textContent = subj + " · " + list.filter(function (d) { return d.built; }).length + "/" + list.length + " ready";
+    sec.appendChild(h);
+
+    var grid = document.createElement("div");
+    grid.className = "chapters";
+    list.forEach(function (d) {
+      var ch = document.createElement("div");
+      ch.className = "ch" + (d.built ? "" : " pending");
+      var top = document.createElement("div");
+      top.className = "top";
+      var name = document.createElement("span");
+      name.className = "name";
+      name.textContent = d.unit;
+      var tier = document.createElement("span");
+      tier.className = "tier " + d.tier;
+      tier.textContent = "Tier " + d.tier;
+      top.appendChild(name);
+      top.appendChild(tier);
+      ch.appendChild(top);
+
+      if (d.built) {
+        var p = deckProgress(d.slug, d.count);
+        var meta = document.createElement("div");
+        meta.className = "meta";
+        meta.innerHTML = '<b>' + p.locked + '</b> locked · <b>' + p.learning + '</b> learning · <b>' + p.fresh + '</b> new';
+        var barWrap = document.createElement("div");
+        barWrap.className = "bar";
+        var fill = document.createElement("div");
+        fill.className = "fill";
+        fill.style.width = Math.round(100 * p.locked / d.count) + "%";
+        barWrap.appendChild(fill);
+        var link = document.createElement("a");
+        link.className = "revise";
+        link.href = "deck.html?deck=" + encodeURIComponent(d.slug);
+        link.textContent = "Revise (" + d.count + " cards)";
+        ch.appendChild(meta);
+        ch.appendChild(barWrap);
+        ch.appendChild(link);
+      } else {
+        var soon = document.createElement("div");
+        soon.className = "soon";
+        soon.textContent = "coming soon";
+        ch.appendChild(soon);
+      }
+      grid.appendChild(ch);
+    });
+    sec.appendChild(grid);
+    holder.appendChild(sec);
+  });
+
+  document.getElementById("backupAllBtn").addEventListener("click", function () {
+    window.Flashcards.backupAll();
+  });
+  document.getElementById("restoreAllBtn").addEventListener("click", function () {
+    document.getElementById("restoreFile").click();
+  });
+  document.getElementById("restoreFile").addEventListener("change", function () {
+    if (this.files && this.files[0]) {
+      window.Flashcards.restoreAll(this.files[0]);
+      this.value = "";
+    }
+  });
+})();
+</script>
+</body>
+</html>

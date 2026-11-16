@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flashcards — JEE Datacenter</title>
+<style>
+  :root {
+    --ink: #111827; --muted: #6b7280; --line: #e5e7eb;
+    --accent: #0f766e; --accent-soft: #ccfbf1; --accent-dark: #115e59;
+    --bg: #f8fafc; --card: #ffffff;
+    --danger: #be123c; --danger-soft: #ffe4e6;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg); color: var(--ink); font-size: 14px; line-height: 1.5;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 14px 16px 60px; }
+
+  header { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+  header h1 { margin: 0; font-size: 17px; color: var(--accent-dark); }
+  header .back { font-size: 12px; color: var(--accent); text-decoration: none; }
+  .sub { color: var(--muted); font-size: 12px; margin-bottom: 12px; }
+
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+  select, button {
+    font: inherit; border: 1px solid var(--line); background: var(--card);
+    border-radius: 8px; padding: 6px 10px; cursor: pointer; color: var(--ink);
+  }
+  button:hover { background: #f1f5f9; }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button.primary:hover { background: var(--accent-dark); }
+  button.ghost { background: transparent; }
+
+  .stats { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .stat {
+    background: var(--card); border: 1px solid var(--line); border-radius: 8px;
+    padding: 5px 10px; font-size: 12px; color: var(--muted);
+  }
+  .stat b { color: var(--ink); font-size: 15px; }
+
+  .flashcard {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    min-height: 220px; padding: 22px 20px; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,.06); user-select: none; position: relative;
+    transition: transform .15s ease;
+  }
+  .flashcard:active { transform: scale(.99); }
+  .flashcard .topic {
+    position: absolute; top: 12px; left: 14px; font-size: 11px; color: var(--accent);
+    background: var(--accent-soft); border-radius: 99px; padding: 2px 8px; font-weight: 600;
+  }
+  .flashcard .hint { position: absolute; bottom: 10px; right: 14px; font-size: 11px; color: #9ca3af; }
+  .flashcard .q { font-size: 20px; font-weight: 600; max-width: 560px; word-wrap: break-word; }
+  .flashcard .a { font-size: 17px; color: var(--accent-dark); max-width: 560px; word-wrap: break-word; display: none; }
+  .flashcard .a code, .flashcard .q code {
+    background: #f1f5f9; border-radius: 4px; padding: 1px 5px; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: .92em;
+  }
+  .flashcard.flipped .q { display: none; }
+  .flashcard.flipped .a { display: block; }
+  .flashcard .num { position: absolute; top: 12px; right: 14px; font-size: 11px; color: #9ca3af; }
+
+  .review { display: flex; gap: 10px; margin-top: 12px; justify-content: center; }
+  .review button { flex: 1; max-width: 180px; padding: 10px; font-weight: 600; }
+  button.again { background: var(--danger-soft); color: var(--danger); border-color: #fecdd3; }
+  button.again:hover { background: #fecdd3; }
+  button.good { background: var(--accent-soft); color: var(--accent-dark); border-color: #99f6e4; }
+  button.good:hover { background: #99f6e4; }
+
+  .empty { text-align: center; color: var(--muted); padding: 40px 10px; }
+  .empty h2 { color: var(--ink); }
+  .kbd { font-size: 11px; color: #9ca3af; text-align: center; margin-top: 10px; }
+  .kbd b { background: #e5e7eb; border-radius: 4px; padding: 0 5px; }
+
+  .print-sheet { display: none; }
+  @media print {
+    .wrap { display: none; }
+    .print-sheet { display: block; }
+  }
+  .print-sheet .card { border: 1px solid #999; border-radius: 6px; padding: 8px 10px; margin: 0 0 6px; break-inside: avoid; page-break-inside: avoid; }
+  .print-sheet h2 { font-size: 13px; margin: 10px 0 4px; }
+  .print-sheet .card .f { font-weight: 700; }
+  .print-sheet .card .b { color: #115e59; margin-top: 3px; }
+  .print-sheet .card .t { font-size: 10px; color: #888; }
+
+  @page { size: A4; margin: 12mm; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1 id="deckTitle">Flashcards</h1>
+    <a class="back" href="index.html">← All chapters</a>
+  </header>
+  <div class="sub">Spaced-repetition revision · offline · progress saves in this browser</div>
+
+  <div class="toolbar">
+    <select id="topicFilter">
+      <option value="all">All topics</option>
+    </select>
+    <button id="shuffleBtn">🔀 Shuffle queue</button>
+    <button id="exportBtn">Export backup</button>
+    <button id="importBtn">Import backup</button>
+    <input type="file" id="importFile" accept="application/json" style="display:none">
+    <button id="resetBtn" class="ghost" style="margin-left:auto; color:var(--danger)">Reset</button>
+    <button id="printBtn" class="ghost">🖨 Print</button>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div id="cardArea">
+    <div class="flashcard" id="card">
+      <span class="topic" id="cardTopic"></span>
+      <span class="num" id="cardNum"></span>
+      <div class="q" id="cardQ"></div>
+      <div class="a" id="cardA"></div>
+      <span class="hint">tap to flip</span>
+    </div>
+    <div class="review">
+      <button class="again" id="againBtn">✗ Again</button>
+      <button class="good primary" id="goodBtn">✓ Good</button>
+    </div>
+    <div class="kbd"><b>space</b> flip · <b>1</b> again · <b>2</b> good</div>
+    <div class="empty" id="emptyMsg" style="display:none"></div>
+  </div>
+</div>
+
+<div class="print-sheet" id="printSheet"></div>
+
+<script src="decks.js"></script>
+<script src="engine.js"></script>
+<script>
+(function () {
+  "use strict";
+  var slug;
+  try { slug = new URLSearchParams(window.location.search).get("deck"); } catch (e) { slug = null; }
+  slug = slug || "relations-functions";
+
+  var decks = window.JEE_DECKS || [];
+  var meta = null;
+  for (var i = 0; i < decks.length; i++) { if (decks[i].slug === slug) { meta = decks[i]; break; } }
+
+  if (!meta || !meta.built) {
+    document.getElementById("cardArea").innerHTML =
+      '<div class="empty"><h2>Deck not found</h2><p>No deck built yet for "' +
+      (meta ? meta.unit : slug) + '".<br><a href="index.html">Back to the datacenter</a></p></div>';
+    document.getElementById("stats").style.display = "none";
+    return;
+  }
+
+  document.title = meta.unit + " — Flashcards";
+  var s = document.createElement("script");
+  s.src = meta.file;
+  s.onload = function () {
+    window.Flashcards.init({ slug: slug, cards: window.DECK_CARDS, meta: meta });
+  };
+  document.head.appendChild(s);
+})();
+</script>
+</body>
+</html>
