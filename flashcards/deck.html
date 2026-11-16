@@ -6,10 +6,10 @@
 <title>Flashcards — JEE Datacenter</title>
 <style>
   :root {
-    --ink: #111827; --muted: #6b7280; --line: #e5e7eb;
-    --accent: #0f766e; --accent-soft: #ccfbf1; --accent-dark: #115e59;
-    --bg: #f8fafc; --card: #ffffff;
-    --danger: #be123c; --danger-soft: #ffe4e6;
+    --ink: #e8ebf1; --muted: #8e99ab; --line: #2a3140;
+    --accent: #2dd4bf; --accent-soft: #134e4a; --accent-dark: #5eead4;
+    --bg: #0d0f13; --card: #161a22;
+    --danger: #fda4af; --danger-soft: #3f1d26;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
@@ -29,9 +29,9 @@
     font: inherit; border: 1px solid var(--line); background: var(--card);
     border-radius: 8px; padding: 6px 10px; cursor: pointer; color: var(--ink);
   }
-  button:hover { background: #f1f5f9; }
-  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
-  button.primary:hover { background: var(--accent-dark); }
+  button:hover { background: #1f2633; }
+  button.primary { background: var(--accent); color: #042f2e; border-color: var(--accent); }
+  button.primary:hover { background: #5eead4; }
   button.ghost { background: transparent; }
 
   .stats { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
@@ -45,7 +45,7 @@
     background: var(--card); border: 1px solid var(--line); border-radius: 14px;
     min-height: 220px; padding: 22px 20px; cursor: pointer;
     display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,.06); user-select: none; position: relative;
+    box-shadow: 0 1px 3px rgba(0,0,0,.35); user-select: none; position: relative;
     transition: transform .15s ease;
   }
   .flashcard:active { transform: scale(.99); }
@@ -53,32 +53,33 @@
     position: absolute; top: 12px; left: 14px; font-size: 11px; color: var(--accent);
     background: var(--accent-soft); border-radius: 99px; padding: 2px 8px; font-weight: 600;
   }
-  .flashcard .hint { position: absolute; bottom: 10px; right: 14px; font-size: 11px; color: #9ca3af; }
+  .flashcard .hint { position: absolute; bottom: 10px; right: 14px; font-size: 11px; color: #6b7280; }
   .flashcard .q { font-size: 20px; font-weight: 600; max-width: 560px; word-wrap: break-word; }
   .flashcard .a { font-size: 17px; color: var(--accent-dark); max-width: 560px; word-wrap: break-word; display: none; }
   .flashcard .a code, .flashcard .q code {
-    background: #f1f5f9; border-radius: 4px; padding: 1px 5px; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: .92em;
+    background: #232a38; border-radius: 4px; padding: 1px 5px; font-family: "SF Mono", Menlo, Consolas, monospace; font-size: .92em;
   }
   .flashcard.flipped .q { display: none; }
   .flashcard.flipped .a { display: block; }
-  .flashcard .num { position: absolute; top: 12px; right: 14px; font-size: 11px; color: #9ca3af; }
+  .flashcard .num { position: absolute; top: 12px; right: 14px; font-size: 11px; color: #6b7280; }
 
   .review { display: flex; gap: 10px; margin-top: 12px; justify-content: center; }
   .review button { flex: 1; max-width: 180px; padding: 10px; font-weight: 600; }
-  button.again { background: var(--danger-soft); color: var(--danger); border-color: #fecdd3; }
-  button.again:hover { background: #fecdd3; }
-  button.good { background: var(--accent-soft); color: var(--accent-dark); border-color: #99f6e4; }
-  button.good:hover { background: #99f6e4; }
+  button.again { background: var(--danger-soft); color: var(--danger); border-color: #7f1d1d; }
+  button.again:hover { background: #5b2333; }
+  button.good { background: var(--accent-soft); color: var(--accent-dark); border-color: #0f766e; }
+  button.good:hover { background: #115e59; }
 
   .empty { text-align: center; color: var(--muted); padding: 40px 10px; }
   .empty h2 { color: var(--ink); }
-  .kbd { font-size: 11px; color: #9ca3af; text-align: center; margin-top: 10px; }
-  .kbd b { background: #e5e7eb; border-radius: 4px; padding: 0 5px; }
+  .kbd { font-size: 11px; color: #6b7280; text-align: center; margin-top: 10px; }
+  .kbd b { background: #2a3140; border-radius: 4px; padding: 0 5px; }
 
   .print-sheet { display: none; }
   @media print {
     .wrap { display: none; }
-    .print-sheet { display: block; }
+    .print-sheet { display: block; color: #111827; background: #fff; }
+    .print-sheet h1, .print-sheet h2, .print-sheet .card .f { color: #111827; }
   }
   .print-sheet .card { border: 1px solid #999; border-radius: 6px; padding: 8px 10px; margin: 0 0 6px; break-inside: avoid; page-break-inside: avoid; }
   .print-sheet h2 { font-size: 13px; margin: 10px 0 4px; }
