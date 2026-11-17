@@ -40,7 +40,7 @@ window.JEE_DECKS = [
   { subject:"Chemistry", unit:"Solutions", slug:"solutions", tier:"A", built:false },
   { subject:"Chemistry", unit:"Equilibrium", slug:"equilibrium", tier:"A", built:false },
   { subject:"Chemistry", unit:"Redox Reactions & Electrochemistry", slug:"redox-reactions-and-electrochemistry", tier:"B", built:false },
-  { subject:"Chemistry", unit:"Chemical Kinetics", slug:"chemical-kinetics", tier:"A", built:false },
+  { subject:"Chemistry", unit:"Chemical Kinetics", slug:"chemical-kinetics", tier:"A", built:true, file:"decks/chemical-kinetics.js", count:49 },
   { subject:"Chemistry", unit:"Classification & Periodicity", slug:"classification-and-periodicity", tier:"A", built:false },
   { subject:"Chemistry", unit:"p-Block Elements", slug:"p-block-elements", tier:"A", built:false },
   { subject:"Chemistry", unit:"d- and f-Block Elements", slug:"d-and-f-block-elements", tier:"A", built:false },
